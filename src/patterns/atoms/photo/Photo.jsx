@@ -1,11 +1,13 @@
-function Photo({index}) {
-
+function Photo({ index, containerClass, navClass, handleNavImages, id }) {
   return (
-    <div className="slider_photo-container">
-      <img  className="slider__photo" 
-            src={'images/' + index + '.jpg'} 
-            alt='model'
-            ></img>
+    <div className={containerClass}>
+      <img 
+        id={id}
+        className={navClass}
+        src={"images/" + index + ".jpg"}
+        alt="model"
+        onMouseOver={handleNavImages}
+      ></img>
     </div>
   );
 }

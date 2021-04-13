@@ -1,83 +1,117 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Photo from "../../atoms/photo/Photo";
-import './slider.scss';
+import "./slider.scss";
 
 const Slider = () => {
-    const images = [];
-    for(let i=1; i<8; i++){
-        images.push(i);
+  // Images array
+  const images = [];
+  for (let i = 1; i < 8; i++) {
+    images.push(i);
+  }
+
+  // Check if slider mode is horrizontal
+  const navIsHorrizontal = () => {
+    return window.innerWidth > 700 ? true : false;
+  };
+
+  // Activate new  dot and disactivate old dots
+  const handleNavDots = (currentActiveSlide) => {
+    // disactivate old nav dot
+    document
+      .querySelector(`.slider__nav-dot--active`)
+      .classList.remove("slider__nav-dot--active");
+
+    // activate new nav dot
+    document
+      .querySelector(`.nav-${currentActiveSlide}`)
+      .classList.add(`slider__nav-dot--active`);
+  };
+
+  const handleNavImages = (event) => {
+    let id = event.target.id;
+    scrollToSlide(id - 1);
+
+    // // disactivate old nav dot
+    document
+      .querySelector(`.slider__nav-img--active`)
+      .classList.remove("slider__nav-img--active");
+
+    // // activate new nav dot
+    document
+      .querySelector(`.slider__nav-img-${id - 1}`)
+      .classList.add(`slider__nav-img--active`);
+  };
+
+  // Scroll to the wanted slide
+  const scrollToSlide = (wantedSlide) => {
+    let slider = document.querySelector(".slider__body");
+    if (navIsHorrizontal()) {
+      let position = wantedSlide * slider.offsetWidth;
+      slider.scrollLeft = position;
+    } else {
+      let position = wantedSlide * slider.offsetHeight;
+      slider.scrollTop = position;
     }
+  };
 
-    const sliderHeight = 731;
-    const [activeSlide, setActiveSlide] = useState(0);
-    let [slider, setSlider] = useState(null)
+  // listen for any scrolling to update active slide
+  useEffect((event) => {
+    // listen for any scrolling to change active one
+    let slider = document.querySelector(".slider__body");
+    slider.addEventListener("scroll", () => {
+      if (!navIsHorrizontal())
+        handleNavDots(Math.round(slider.scrollTop / slider.offsetHeight));
+    });
+  });
 
-
-    const scrollToSlide = wantedSlide => {
-        let position = wantedSlide*sliderHeight;
-        slider.scrollTop = position;
-    }
-
-
-    const activeNav = () => {
-        document.querySelector(`.nav-${activeSlide}`)
-                .classList
-                .add(`slider__nav-dot--active`);
-    }
-
-
-    const clearNavs = () => {
-        document.querySelector(`.slider__nav-dot--active`)
-                .classList
-                .remove('slider__nav-dot--active');
-    }
-
-    useEffect(() => {
-        slider = document.querySelector(".slider");
-        setSlider(slider);
-        slider.addEventListener('scroll', function ( event ) {
-
-            let isScrolling;
-            // Clear our timeout throughout the scroll
-            window.clearTimeout( isScrolling );
-        
-            // Set a timeout to run after scrolling ends
-            isScrolling = setTimeout(function() {
-        
-                // Run the callback
-                let currentSlide = Math.ceil(slider.scrollTop / sliderHeight);
-                setActiveSlide(currentSlide);
-        
-            }, 66);
-        
-        }, false);
-    }, [])
-
-    useEffect(() => {
-        clearNavs();
-        activeNav(activeSlide);
-    }, [activeSlide])
-
-    return ( 
-        <div className="slider">
-            {images.map(index => {
-                return(
-                    <Photo key={'key-' + index} index={index}/>
-                )}
-            )}
-            <div className="slider__nav-container">
-                {images.map(index => {
-                    return(
-                        <div 
-                            className={`slider__nav-dot nav-${index - 1} ${index - 1 === 0 ? "slider__nav-dot--active" : ""}`}
-                            key={`nav-${index}`}
-                            onClick={() => scrollToSlide(index - 1)}
-                        ></div>
-                    )
-                })}
-            </div>
-        </div>
-    );
-}
+  return (
+    <div className="slider">
+      <div className="slider__body">
+        {images.map((index) => {
+          return (
+            <Photo
+              id={"main-image"}
+              key={"key-" + index}
+              index={index}
+              navClass={`slider__photo slider__photo-${index}`}
+              containerClass="slider__photo-container"
+            />
+          );
+        })}
+      </div>
+      <div className="slider__nav-images-container">
+        {images.map((index) => {
+          return (
+            <Photo
+              key={"key-" + index}
+              index={index}
+              id={index}
+              containerClass="slider__nav-img-container"
+              navClass={`slider__nav-img slider__nav-img-${index - 1} ${
+                index === 1 ? "slider__nav-img--active" : ``
+              }`}
+              handleNavImages={handleNavImages}
+            />
+          );
+        })}
+        <button className="slider__previous"></button>
+        <button className="slider__next"></button>
+      </div>
+      <div className="slider__nav-container">
+        {images.map((index) => {
+          return (
+            <div
+              className={`slider__nav-dot nav-${index - 1} ${
+                index - 1 === 0 ? "slider__nav-dot--active" : ""
+              }`}
+              key={`nav-${index}`}
+              onClick={() => scrollToSlide(index - 1)}
+            ></div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export default Slider;
