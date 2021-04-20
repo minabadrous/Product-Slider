@@ -10,9 +10,7 @@ const Slider = () => {
   }
 
   // Check if slider mode is horrizontal
-  const navIsHorrizontal = () => {
-    return window.innerWidth > 700 ? true : false;
-  };
+  const navIsHorrizontal = () => window.innerWidth > 700 ? true : false;
 
   // Activate new  dot and disactivate old dots
   const handleNavDots = (currentActiveSlide) => {
@@ -55,13 +53,17 @@ const Slider = () => {
   };
 
   // listen for any scrolling to update active slide
-  useEffect((event) => {
+  useEffect(() => {
     // listen for any scrolling to change active one
     let slider = document.querySelector(".slider__body");
     slider.addEventListener("scroll", () => {
       if (!navIsHorrizontal())
         handleNavDots(Math.round(slider.scrollTop / slider.offsetHeight));
     });
+
+    window.addEventListener('resize', ()=> {
+      if(navIsHorrizontal) scrollToSlide(document.querySelector(".slider__nav-img--active").classList[1].slice(-1))
+    })
   });
 
   return (
